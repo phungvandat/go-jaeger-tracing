@@ -1,10 +1,13 @@
-.PHONY: server client
+.PHONY: server1 client server2
 
 setup:
 	@docker-compose up -d
 
-server: 
-	@go run server/*.go
+server1: 
+	@go run server1/*.go
+
+server2:
+	@go run server2/*.go
 
 client:
 	@go run client/*.go

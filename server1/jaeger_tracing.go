@@ -9,12 +9,16 @@ import (
 	"github.com/uber/jaeger-client-go/config"
 )
 
+const (
+	serviceName = "server_1"
+)
+
 func initJaeger() func() {
 	cfg := config.Configuration{
-		ServiceName: "service_a",
+		ServiceName: serviceName,
 		Sampler: &config.SamplerConfig{
-			Type:  "const",
-			Param: 1,
+			Type:  jaeger.SamplerTypeConst,
+			Param: 1, // trace every call
 		},
 		Reporter: &config.ReporterConfig{
 			LogSpans:            true,
