@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "github.com/phungvandat/userproto";
+
+package userproto;
+
+service UserSvc {
+    rpc GetUser(GetUserReq) returns(GetUserRes){}
+}
+
+message GetUserReq {
+    int32 id=1;
+}
+
+message User {
+    int32 id=1;
+    string username=2;
+}
+
+message GetUserRes {
+    User user=1;
+}
