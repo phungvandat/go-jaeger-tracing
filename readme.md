@@ -1,5 +1,7 @@
 # EXAMPLE JAEGER TRACING
 
+![jaeger-go](https://raw.githubusercontent.com/phungvandat/jaegertracing/master/images/jaeger.png)
+
 ## SETUP
 
 - `make setup`
