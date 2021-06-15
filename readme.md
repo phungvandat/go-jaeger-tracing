@@ -1,6 +1,6 @@
 # EXAMPLE JAEGER TRACING
 
-![jaeger-go](https://raw.githubusercontent.com/phungvandat/jaegertracing/master/images/jaeger.png)
+![jaeger-go](https://raw.githubusercontent.com/phungvandat/go-jaeger-tracing/master/images/jaeger.png)
 
 ## SETUP
 

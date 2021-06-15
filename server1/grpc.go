@@ -10,7 +10,7 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
-	"github.com/phungvandat/jaegertracing/userproto"
+	"github.com/phungvandat/go-jaeger-tracing/userproto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

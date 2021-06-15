@@ -1,4 +1,4 @@
-module github.com/phungvandat/jaegertracing
+module github.com/phungvandat/go-jaeger-tracing
 
 go 1.16
 
