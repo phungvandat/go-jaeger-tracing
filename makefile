@@ -1,6 +1,7 @@
 .PHONY: server1 client server2
 
 setup:
+	./setup.sh
 	@docker-compose up -d
 
 server1: 

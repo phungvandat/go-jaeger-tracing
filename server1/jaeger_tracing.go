@@ -21,7 +21,6 @@ func initJaeger() func() {
 			Param: 1, // trace every call
 		},
 		Reporter: &config.ReporterConfig{
-			LogSpans:            true,
 			BufferFlushInterval: 1 * time.Second,
 		},
 	}

@@ -53,15 +53,20 @@ func phase2(ctx context.Context) {
 	phase3(ctx)
 }
 
-func phase3(ctx context.Context) {
+func phase3(ctx context.Context) (err error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "sv1_phase3")
-	defer span.Finish()
+	defer func() {
+		defer span.Finish()
+		if err == nil {
+			return
+		}
+		span.LogKV("error", err)
+		ext.Error.Set(span, true)
+		log.Println("error: ", err)
+	}()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:4321/call_svc_1", nil)
 	if err != nil {
-		ext.Error.Set(span, true)
-		span.LogKV("error", err)
-		log.Panicf("error: %v", err)
 		return
 	}
 
@@ -73,7 +78,10 @@ func phase3(ctx context.Context) {
 	ext.HTTPMethod.Set(span, http.MethodGet)
 
 	tracer := opentracing.GlobalTracer()
-	tracer.Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header)) // inject Uber-Trace-Id to header
+	err = tracer.Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header)) // inject Uber-Trace-Id to header
+	if err != nil {
+		return
+	}
 
 	client := &http.Client{Timeout: time.Second * 10}
 	response, err := client.Do(req)
@@ -85,13 +93,7 @@ func phase3(ctx context.Context) {
 			}
 		}()
 	}
-
-	if err != nil {
-		err = fmt.Errorf("failed to call server 2")
-	}
-	span.LogKV("error", err)
-	ext.Error.Set(span, true)
-	log.Println(err)
+	return nil
 }
 
 func httpServer() error {

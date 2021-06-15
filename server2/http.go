@@ -26,6 +26,7 @@ func (s *httpServe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer span.Finish()
 	defer func() {
 		if r := recover(); r != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Println("r", r)
 			span.LogKV("panic", r)
 			ext.Error.Set(span, true)

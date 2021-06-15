@@ -8,8 +8,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 	"github.com/phungvandat/jaegertracing/userproto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type userSvc struct {
@@ -33,10 +36,50 @@ func grpcServer() error {
 		log.Fatalf("failed to listen: %s\n", addr)
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			mwUnary,
+		),
+	)
 	userproto.RegisterUserSvcServer(s, &userSvc{})
 
 	log.Printf("listening GRPC: localhost%s\n", addr)
 
 	return s.Serve(lis)
+}
+
+func mwUnary(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler) (resp interface{}, err error) {
+	ctx, span := mwTrace(ctx, info)
+	defer span.Finish()
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%v", err)
+			fmt.Println("r", r)
+			span.LogKV("panic", r)
+			ext.Error.Set(span, true)
+		}
+	}()
+
+	return handler(ctx, req)
+}
+
+func mwTrace(ctx context.Context, info *grpc.UnaryServerInfo) (context.Context, opentracing.Span) {
+	header, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		header = make(metadata.MD)
+	}
+
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(
+		opentracing.HTTPHeaders,
+		opentracing.HTTPHeadersCarrier(header),
+	)
+	span := tracer.StartSpan(info.FullMethod, ext.RPCServerOption(spanCtx))
+	ctx = opentracing.ContextWithSpan(ctx, span)
+
+	return ctx, span
 }
