@@ -85,6 +85,8 @@ func phase3(ctx context.Context) {
 			}
 		}()
 	}
+
+	err = fmt.Errorf("failed to call server 2")
 	if err != nil {
 		span.LogKV("error", err)
 		ext.Error.Set(span, true)

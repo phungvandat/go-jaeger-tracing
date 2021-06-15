@@ -16,7 +16,6 @@ import (
 type httpServe struct{}
 
 func (s *httpServe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Header)
 	tracer := opentracing.GlobalTracer()
 	spanCtx, _ := tracer.Extract(
 		opentracing.HTTPHeaders,
